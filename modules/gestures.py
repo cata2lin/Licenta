@@ -1,5 +1,5 @@
 """
-modules/gestures.py - Gesture recognition engine.
+Gesture recognition engine.
 
 Analyses MediaPipe hand landmarks to classify the current hand pose into
 one of the defined gestures and extract cursor/scroll parameters.
@@ -29,11 +29,6 @@ from utils.geometry import distance_2d, is_finger_extended
 
 logger = logging.getLogger(__name__)
 
-
-# ---------------------------------------------------------------------------
-# Gesture types
-# ---------------------------------------------------------------------------
-
 class GestureType(Enum):
     NONE = "none"
     POINT = "point"              # Index up, others curled -> move cursor
@@ -59,20 +54,10 @@ class GestureResult:
     confidence: float     # 0-1 - how clearly the gesture is formed
     pinch_distance: float  # Thumb-index distance (normalised)
 
-
-# ---------------------------------------------------------------------------
-# Recogniser
-# ---------------------------------------------------------------------------
-
 class GestureRecognizer:
-    """
-    Stateful gesture recogniser with temporal filtering.
-
-    Features:
-    - Stability buffer: requires N frames of consistent classification
-    - Hysteresis: different thresholds for entering vs leaving a gesture
-    - Click cooldown: prevents rapid repeated clicks
-    - Swipe detection from wrist velocity
+    """Clasifica gestul mâinii pe baza pozițiilor degetelor.
+    Folosește un buffer de stabilitate, histereză și cooldown
+    pentru a evita clasificări false.
     """
 
     def __init__(self) -> None:
@@ -109,10 +94,6 @@ class GestureRecognizer:
         # Previous finger states for hysteresis
         self._prev_fingers: list[bool] = [False] * 5
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
     def recognize(self, hand: HandData) -> GestureResult:
         """Classify the current hand pose with temporal filtering."""
         lm = hand.landmarks
@@ -127,16 +108,8 @@ class GestureRecognizer:
 
         # Also compute thumb-index MCP distance for gesture disambiguation
         thumb_index_spread = distance_2d(lm[THUMB_TIP][:2], lm[INDEX_MCP][:2])
-
-        # ----------------------------------------------------------
-        # Finger states with hysteresis
-        # ----------------------------------------------------------
         fingers = self._get_finger_states(lm, handedness)
         num_extended = sum(fingers)
-
-        # ----------------------------------------------------------
-        # Swipe detection (wrist x-velocity)
-        # ----------------------------------------------------------
         now = time.monotonic()
         wrist_x = lm[WRIST][0]
         self._wrist_history.append((wrist_x, now))
@@ -152,10 +125,6 @@ class GestureRecognizer:
                 confidence=0.9,
                 pinch_distance=pinch_dist,
             )
-
-        # ----------------------------------------------------------
-        # Pinch detection with hysteresis
-        # ----------------------------------------------------------
         # Only consider pinch if index finger is NOT clearly pointing
         # (when pointing, thumb may rest near index but shouldn't trigger pinch)
         if not self._pinch_active:
@@ -205,10 +174,6 @@ class GestureRecognizer:
                 confidence=0.5,
                 pinch_distance=pinch_dist,
             )
-
-        # ----------------------------------------------------------
-        # Static gesture classification with stability buffer
-        # ----------------------------------------------------------
         raw_gesture = self._classify_static(
             fingers, num_extended, pinch_dist, thumb_index_spread,
         )
@@ -226,10 +191,6 @@ class GestureRecognizer:
             confidence=0.85 if stable_gesture != GestureType.NONE else 0.3,
             pinch_distance=pinch_dist,
         )
-
-    # ------------------------------------------------------------------
-    # Finger state detection with hysteresis
-    # ------------------------------------------------------------------
 
     def _get_finger_states(
         self, lm: list[tuple[float, float, float]], handedness: str,
@@ -273,10 +234,6 @@ class GestureRecognizer:
         self._prev_fingers = fingers
         return fingers
 
-    # ------------------------------------------------------------------
-    # Stability buffer
-    # ------------------------------------------------------------------
-
     def _get_stable_gesture(self, raw_gesture: GestureType) -> GestureType:
         """
         Return a stable gesture using majority vote over the buffer.
@@ -304,10 +261,6 @@ class GestureRecognizer:
 
         return self._confirmed_gesture
 
-    # ------------------------------------------------------------------
-    # Click cooldown
-    # ------------------------------------------------------------------
-
     def _can_click(self, now: float, click_type: str) -> bool:
         """Check and update click cooldown. Returns True if click is allowed."""
         cooldown_s = self.click_cooldown_ms / 1000.0
@@ -333,10 +286,6 @@ class GestureRecognizer:
             self._last_dclick_time = now
             return True
         return True
-
-    # ------------------------------------------------------------------
-    # Static gesture classification
-    # ------------------------------------------------------------------
 
     def _classify_static(
         self,
@@ -423,11 +372,6 @@ class GestureRecognizer:
             return GestureType.SWIPE_LEFT
 
         return None
-
-
-# ------------------------------------------------------------------
-# Standalone demo
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     import cv2
 

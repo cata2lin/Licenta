@@ -12,19 +12,11 @@ import copy
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
 ROOT_DIR = Path(__file__).resolve().parent
 SETTINGS_PATH = ROOT_DIR / "settings.json"
 ASSETS_DIR = ROOT_DIR / "assets"
 LOG_DIR = ROOT_DIR / "logs"
 MODEL_DIR = Path(os.environ.get("LOCALAPPDATA", ROOT_DIR)) / "HandVoiceControl" / "models"
-
-# ---------------------------------------------------------------------------
-# Default settings (used when settings.json is missing or incomplete)
-# ---------------------------------------------------------------------------
 DEFAULTS: dict = {
     "camera": {
         "device_index": 0,
@@ -73,11 +65,6 @@ DEFAULTS: dict = {
         "log_level": "INFO",
     },
 }
-
-
-# ---------------------------------------------------------------------------
-# Internal state — populated by load()
-# ---------------------------------------------------------------------------
 _settings: dict = {}
 
 

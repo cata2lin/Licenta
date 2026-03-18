@@ -17,7 +17,7 @@ class TestSmoother:
         s = Smoother(freq=30, deadzone=0.05)
         s.smooth(0.5, 0.5)  # Init
 
-        # Tiny movement within deadzone — should be suppressed
+        # Tiny movement within deadzone  -  should be suppressed
         x, y = s.smooth(0.51, 0.51)
         assert x == pytest.approx(0.5)
         assert y == pytest.approx(0.5)
@@ -26,7 +26,7 @@ class TestSmoother:
         s = Smoother(freq=30, deadzone=0.01)
         s.smooth(0.5, 0.5)  # Init
 
-        # Larger movement — should produce a different result
+        # Larger movement  -  should produce a different result
         x, y = s.smooth(0.7, 0.7)
         assert x != pytest.approx(0.5)
         assert y != pytest.approx(0.5)
@@ -35,7 +35,7 @@ class TestSmoother:
         s = Smoother(freq=30, deadzone=0.0, min_cutoff=5.0, beta=0.5)
         s.smooth(0.0, 0.0)
 
-        # Feed the same target repeatedly — should converge
+        # Feed the same target repeatedly  -  should converge
         for _ in range(50):
             x, y = s.smooth(1.0, 1.0)
 
@@ -46,7 +46,7 @@ class TestSmoother:
         s = Smoother(freq=30, deadzone=0.0, min_cutoff=100.0, beta=1.0)
         s.smooth(0.0, 0.0)
 
-        # Very large jump — should be clamped to [0, 1]
+        # Very large jump  -  should be clamped to [0, 1]
         x, y = s.smooth(1.0, 1.0)
         assert 0.0 <= x <= 1.0
         assert 0.0 <= y <= 1.0
@@ -92,7 +92,7 @@ class TestOneEuroFilter:
         f = OneEuroFilter(freq=30.0, min_cutoff=1.0, beta=1.0)
 
         f(0.0)
-        # Step to 1.0 — high beta should make filter responsive
+        # Step to 1.0  -  high beta should make filter responsive
         for _ in range(10):
             result = f(1.0)
 

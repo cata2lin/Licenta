@@ -1,5 +1,5 @@
 """
-modules/camera.py — Webcam capture thread.
+Webcam capture thread.
 
 Continuously reads frames from the webcam in a dedicated thread and
 exposes the latest frame to consumers via get_frame().
@@ -97,10 +97,6 @@ class Camera:
     def is_opened(self) -> bool:
         return self._cap is not None and self._cap.isOpened()
 
-    # ------------------------------------------------------------------
-    # Internal
-    # ------------------------------------------------------------------
-
     def _capture_loop(self) -> None:
         """Continuously grab frames until stop() is called."""
         while self._running:
@@ -117,11 +113,6 @@ class Camera:
                 self._frame = frame
 
         logger.debug("Capture loop exited")
-
-
-# ------------------------------------------------------------------
-# Standalone demo
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     config.load()

@@ -1,5 +1,5 @@
 """
-modules/vad.py — Voice Activity Detection wrapper.
+Voice Activity Detection wrapper.
 
 Uses webrtcvad to detect speech boundaries in a stream of PCM audio
 chunks and emits complete utterances (with pre-padding for word onsets).
@@ -18,21 +18,14 @@ logger = logging.getLogger(__name__)
 
 
 class VoiceActivityDetector:
-    """
-    Accumulate audio chunks, detect when the user starts and stops
-    speaking, and return the complete utterance as a single bytes buffer.
+    """Acumuleaza chunk-uri audio, detecteaza cand userul incepe si
+    termina de vorbit, si returneaza pronuntarea completa.
 
-    Parameters
-    ----------
-    aggressiveness : int
-        webrtcvad aggressiveness (0–3).  Higher = more aggressive at
-        filtering non-speech.
-    sample_rate : int
-        Must match the audio capture rate (16 000 recommended).
-    silence_duration_ms : int
-        How many milliseconds of silence mark the end of an utterance.
-    frame_duration_ms : int
-        Duration of each incoming chunk (must be 10, 20, or 30).
+    Args:
+        aggressiveness: cat de agresiv filtreaza non-speech (0-3)
+        sample_rate: frecventa audio (16000 recomandat)
+        silence_duration_ms: cat timp de tacere = sfarsitul pronuntarii
+        frame_duration_ms: durata fiecarui chunk (10, 20 sau 30ms)
     """
 
     def __init__(

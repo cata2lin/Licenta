@@ -1,5 +1,5 @@
 """
-modules/mouse_controller.py — Win32 mouse input simulation via ctypes.
+Win32 mouse input simulation via ctypes.
 
 Uses SendInput with INPUT_MOUSE structures for absolute positioning,
 clicks, and scroll events.
@@ -13,10 +13,6 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# Win32 constants
-# ---------------------------------------------------------------------------
 INPUT_MOUSE = 0
 MOUSEEVENTF_MOVE = 0x0001
 MOUSEEVENTF_LEFTDOWN = 0x0002
@@ -29,11 +25,6 @@ MOUSEEVENTF_WHEEL = 0x0800
 MOUSEEVENTF_ABSOLUTE = 0x8000
 
 WHEEL_DELTA = 120  # Standard Windows scroll unit
-
-
-# ---------------------------------------------------------------------------
-# Win32 structures
-# ---------------------------------------------------------------------------
 class MOUSEINPUT(ctypes.Structure):
     _fields_ = [
         ("dx", ctypes.wintypes.LONG),
@@ -55,11 +46,6 @@ class INPUT(ctypes.Structure):
         ("_union", _INPUT_UNION),
     ]
 
-
-# ---------------------------------------------------------------------------
-# Controller class
-# ---------------------------------------------------------------------------
-
 class MouseController:
     """
     Move the mouse cursor and generate click / scroll events.
@@ -75,13 +61,9 @@ class MouseController:
         self._click_debounce: float = 0.05  # 50 ms between clicks
         logger.info("MouseController ready - screen %dx%d", self.screen_w, self.screen_h)
 
-    # ------------------------------------------------------------------
-    # Movement
-    # ------------------------------------------------------------------
-
     def move_to(self, x: int, y: int) -> None:
         """Move cursor to absolute screen position (x, y)."""
-        # Normalise to 0–65535 range for MOUSEEVENTF_ABSOLUTE
+        # Normalise to 0-65535 range for MOUSEEVENTF_ABSOLUTE
         abs_x = int(x * 65535 / self.screen_w)
         abs_y = int(y * 65535 / self.screen_h)
         self._send(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE, abs_x, abs_y)
@@ -89,10 +71,6 @@ class MouseController:
     def move_relative(self, dx: int, dy: int) -> None:
         """Move cursor by a relative offset in pixels."""
         self._send(MOUSEEVENTF_MOVE, dx, dy)
-
-    # ------------------------------------------------------------------
-    # Clicks
-    # ------------------------------------------------------------------
 
     def left_click(self) -> None:
         if not self._debounce_ok():
@@ -127,20 +105,12 @@ class MouseController:
     def left_up(self) -> None:
         self._send(MOUSEEVENTF_LEFTUP)
 
-    # ------------------------------------------------------------------
-    # Scroll
-    # ------------------------------------------------------------------
-
     def scroll(self, amount: int) -> None:
         """Scroll vertically.  Positive = up, negative = down."""
         inp = INPUT(type=INPUT_MOUSE)
         inp.mi.mouseData = ctypes.wintypes.DWORD(amount * WHEEL_DELTA)
         inp.mi.dwFlags = MOUSEEVENTF_WHEEL
         ctypes.windll.user32.SendInput(1, ctypes.byref(inp), ctypes.sizeof(INPUT))
-
-    # ------------------------------------------------------------------
-    # Internals
-    # ------------------------------------------------------------------
 
     def _debounce_ok(self) -> bool:
         now = time.monotonic()

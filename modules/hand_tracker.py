@@ -1,5 +1,5 @@
 """
-modules/hand_tracker.py - MediaPipe Hand Landmarker wrapper.
+MediaPipe Hand Landmarker wrapper.
 
 Accepts a BGR frame, runs MediaPipe hand landmark detection, and returns
 structured HandData objects with both normalised and pixel landmarks.
@@ -202,11 +202,6 @@ class HandTracker:
         """Release MediaPipe resources."""
         self._landmarker.close()
         logger.info("HandTracker closed")
-
-
-# ------------------------------------------------------------------
-# Standalone demo
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     config.load()

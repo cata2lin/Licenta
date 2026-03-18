@@ -1,5 +1,5 @@
 """
-modules/orchestrator.py — Central coordinator.
+Central coordinator.
 
 Manages the hand-tracking, voice-control, and input-simulation pipelines
 across multiple threads and dispatches gestures / voice commands to the
@@ -38,15 +38,9 @@ class AppMode(Enum):
 
 
 class Orchestrator:
-    """
-    Top-level controller that wires every subsystem together.
-
-    Threading model
-    ---------------
-    - **Camera thread** : captures frames → hand detection → gesture queue
-    - **Audio thread**  : captures audio  → VAD → utterance queue
-    - **Processing thread** : polls queues, runs ASR, dispatches actions
-    - **Main thread**   : pystray (or KeyboardInterrupt loop)
+    """Coordoneaza toate subsistemele: camera, audio, recunoastere gesturi,
+    comenzi vocale. Ruleaza pe thread-uri separate pentru camera, audio si
+    procesare, iar thread-ul principal se ocupa de preview/tray.
     """
 
     def __init__(self) -> None:
@@ -100,10 +94,6 @@ class Orchestrator:
         self._camera_thread: threading.Thread | None = None
         self._audio_thread: threading.Thread | None = None
         self._processing_thread: threading.Thread | None = None
-
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
 
     def start(self) -> None:
         """Initialise all subsystems and launch worker threads."""
@@ -191,7 +181,7 @@ class Orchestrator:
         new_mode = AppMode(mode)
         if new_mode == self._mode:
             return
-        logger.info("Mode change: %s → %s", self._mode.value, new_mode.value)
+        logger.info("Mode change: %s -> %s", self._mode.value, new_mode.value)
         was_running = self._running
         if was_running:
             self.stop()
@@ -199,10 +189,6 @@ class Orchestrator:
         config.set_value("app", "mode", mode)
         if was_running:
             self.start()
-
-    # ------------------------------------------------------------------
-    # Initialisation helpers
-    # ------------------------------------------------------------------
 
     def _init_hand(self) -> None:
         self._camera = Camera()
@@ -232,10 +218,6 @@ class Orchestrator:
             daemon=True,
             name="WhisperLoader",
         ).start()
-
-    # ------------------------------------------------------------------
-    # Worker loops
-    # ------------------------------------------------------------------
 
     def _camera_loop(self) -> None:
         """Capture frames -> detect hands -> recognise gestures -> push to queue."""
@@ -272,7 +254,7 @@ class Orchestrator:
         logger.info("Camera loop exited")
 
     def _audio_loop(self) -> None:
-        """Capture audio → VAD → push complete utterances to queue."""
+        """Capture audio -> VAD -> push complete utterances to queue."""
         logger.info("Audio loop started")
         while self._running:
             if self._audio_capture is None:
@@ -324,10 +306,6 @@ class Orchestrator:
             time.sleep(1 / 120)  # ~120 Hz (lower latency gesture response)
         logger.info("Processing loop exited")
 
-    # ------------------------------------------------------------------
-    # Gesture handlers
-    # ------------------------------------------------------------------
-
     def _handle_gesture(self, result: GestureResult) -> None:
         """Map a gesture result to a mouse/keyboard action."""
         screen_w = self._mouse.screen_w
@@ -365,7 +343,7 @@ class Orchestrator:
                 # On first frame of scroll, record the Y position as anchor.
                 # Then scroll based on cumulative displacement from anchor.
                 if self._prev_scroll_y is None:
-                    # Entering scroll mode — set anchor
+                    # Entering scroll mode  -  set anchor
                     self._prev_scroll_y = result.cursor_y
                     self._scroll_accum = 0.0
                 else:
@@ -419,10 +397,6 @@ class Orchestrator:
             roi_y_min=self._roi_y_min,
             roi_y_max=self._roi_y_max,
         )
-
-    # ------------------------------------------------------------------
-    # Voice command handlers
-    # ------------------------------------------------------------------
 
     def _handle_command(self, cmd: ParsedCommand) -> None:
         """Execute a parsed voice command."""

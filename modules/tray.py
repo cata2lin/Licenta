@@ -1,5 +1,5 @@
 """
-modules/tray.py — System tray icon & menu.
+System tray icon & menu.
 
 Uses pystray + Pillow to create a tray icon with Start/Stop, mode
 switching, preview toggle, and Exit.  Must run on the main thread on
@@ -22,11 +22,6 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-
-# ---------------------------------------------------------------------------
-# Icon drawing helpers
-# ---------------------------------------------------------------------------
-
 def _make_icon(colour: str = "green", size: int = 64) -> Image.Image:
     """Create a simple coloured circle icon."""
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
@@ -48,31 +43,15 @@ _ICON_COLOURS = {
     "voice_only": "#3b82f6",  # blue
 }
 
-
-# ---------------------------------------------------------------------------
-# TrayApp
-# ---------------------------------------------------------------------------
-
 class TrayApp:
-    """
-    System tray application.
-
-    Parameters
-    ----------
-    orchestrator : Orchestrator
-        Reference to the central orchestrator for start/stop/mode control.
-    """
+    """Aplicatia de system tray - meniu cu Start/Stop, mod, preview, Exit."""
 
     def __init__(self, orchestrator: Orchestrator) -> None:
         self._orch = orchestrator
         self._icon: pystray.Icon | None = None
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
     def run(self) -> None:
-        """Start the tray icon — **blocks** on the main thread."""
+        """Start the tray icon  -  **blocks** on the main thread."""
         menu = pystray.Menu(
             pystray.MenuItem("Start", self._on_start, default=True),
             pystray.MenuItem("Pause", self._on_pause),
@@ -109,10 +88,6 @@ class TrayApp:
         colour = _ICON_COLOURS.get(state, "#22c55e")
         if self._icon:
             self._icon.icon = _make_icon(colour)
-
-    # ------------------------------------------------------------------
-    # Menu callbacks
-    # ------------------------------------------------------------------
 
     def _on_start(self, icon, item) -> None:
         if not self._orch.is_running():

@@ -1,5 +1,5 @@
 """
-modules/keyboard_controller.py — Win32 keyboard input simulation via ctypes.
+Win32 keyboard input simulation via ctypes.
 
 Uses SendInput with INPUT_KEYBOARD structures.  Supports individual key
 presses, multi-key hotkeys, and Unicode text typing.
@@ -13,10 +13,6 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# Win32 constants
-# ---------------------------------------------------------------------------
 INPUT_KEYBOARD = 1
 KEYEVENTF_KEYUP = 0x0002
 KEYEVENTF_UNICODE = 0x0004
@@ -38,13 +34,8 @@ VK_RIGHT = 0x27
 VK_DOWN = 0x28
 VK_F4 = 0x73
 
-# Letter keys: ord("A") - ord("Z") = 0x41–0x5A
-# Number keys: ord("0") - ord("9") = 0x30–0x39
-
-
-# ---------------------------------------------------------------------------
-# Win32 structures
-# ---------------------------------------------------------------------------
+# Letter keys: ord("A") - ord("Z") = 0x41-0x5A
+# Number keys: ord("0") - ord("9") = 0x30-0x39
 class KEYBDINPUT(ctypes.Structure):
     _fields_ = [
         ("wVk", ctypes.wintypes.WORD),
@@ -64,11 +55,6 @@ class INPUT(ctypes.Structure):
         ("type", ctypes.wintypes.DWORD),
         ("_union", _INPUT_UNION),
     ]
-
-
-# ---------------------------------------------------------------------------
-# Controller class
-# ---------------------------------------------------------------------------
 
 class KeyboardController:
     """Simulate keyboard input via Win32 SendInput."""
@@ -106,10 +92,6 @@ class KeyboardController:
         for char in text:
             self._unicode_char(char)
             time.sleep(0.005)  # Small delay for stability
-
-    # ------------------------------------------------------------------
-    # Internals
-    # ------------------------------------------------------------------
 
     @staticmethod
     def _key_down(vk_code: int) -> None:

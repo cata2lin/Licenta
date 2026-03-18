@@ -107,11 +107,8 @@ def main() -> None:
     logger.info("Mode: %s", config.get("app", "mode"))
     logger.info("Preview: %s", config.get("app", "show_preview"))
     logger.info("Failsafe: press Ctrl+C or close the preview window (Q) to stop")
-
-    # ------------------------------------------------------------------
     # Import heavy modules here (after logging is ready) so startup
     # problems are logged clearly.
-    # ------------------------------------------------------------------
     from modules.orchestrator import Orchestrator
 
     orchestrator = Orchestrator()

@@ -1,5 +1,5 @@
 """
-modules/speech_recognizer.py — Offline speech-to-text with faster-whisper.
+Offline speech-to-text with faster-whisper.
 
 Loads a Whisper model and transcribes raw PCM audio buffers into text.
 Supports Romanian and English.
@@ -65,25 +65,12 @@ class SpeechRecognizer:
         logger.info("Whisper model loaded in %.1f s", elapsed)
 
     def transcribe(self, audio: bytes, sample_rate: int = 16000) -> str:
-        """
-        Transcribe raw 16-bit PCM audio bytes into text.
-
-        Parameters
-        ----------
-        audio : bytes
-            Raw PCM16 audio (mono, *sample_rate* Hz).
-        sample_rate : int
-            Sample rate of the audio.
-
-        Returns
-        -------
-        str
-            The transcribed text (empty string if nothing recognised).
-        """
+        """Transcrie audio PCM 16-bit in text. Returneaza string gol
+        daca nu s-a recunoscut nimic."""
         if self._model is None:
             self.load_model()
 
-        # Convert bytes → float32 numpy array in [-1, 1]
+        # Convert bytes -> float32 numpy array in [-1, 1]
         audio_np = np.frombuffer(audio, dtype=np.int16).astype(np.float32) / 32768.0
 
         t0 = time.monotonic()
@@ -104,11 +91,6 @@ class SpeechRecognizer:
         elapsed = time.monotonic() - t0
         logger.debug("Transcribed in %.2f s: '%s'", elapsed, text)
         return text
-
-
-# ------------------------------------------------------------------
-# Standalone demo
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
 

@@ -1,5 +1,5 @@
 """
-modules/window_manager.py — Win32 window management.
+Win32 window management.
 
 Enumerate, focus, minimize, maximize, and close windows.  Also launch
 applications by name via configurable aliases.
@@ -31,10 +31,6 @@ class WindowInfo:
 
 class WindowManager:
     """High-level window operations backed by pywin32."""
-
-    # ------------------------------------------------------------------
-    # Enumerate
-    # ------------------------------------------------------------------
 
     @staticmethod
     def list_windows() -> list[WindowInfo]:
@@ -76,10 +72,6 @@ class WindowManager:
         title = win32gui.GetWindowText(hwnd)
         return WindowInfo(hwnd=hwnd, title=title, process_name="", is_visible=True)
 
-    # ------------------------------------------------------------------
-    # Focus / show
-    # ------------------------------------------------------------------
-
     @staticmethod
     def focus_window(hwnd: int) -> None:
         try:
@@ -92,10 +84,6 @@ class WindowManager:
             win32gui.SetForegroundWindow(hwnd)
         except Exception as exc:
             logger.warning("Failed to focus window %d: %s", hwnd, exc)
-
-    # ------------------------------------------------------------------
-    # Minimize / maximize / close
-    # ------------------------------------------------------------------
 
     @staticmethod
     def minimize_window(hwnd: int | None = None) -> None:
@@ -118,10 +106,6 @@ class WindowManager:
             win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
             logger.info("Closed window %d", hwnd)
 
-    # ------------------------------------------------------------------
-    # Search
-    # ------------------------------------------------------------------
-
     @classmethod
     def find_window_by_title(cls, query: str) -> WindowInfo | None:
         """Find the first visible window whose title contains *query*."""
@@ -130,10 +114,6 @@ class WindowManager:
             if query_lower in win.title.lower():
                 return win
         return None
-
-    # ------------------------------------------------------------------
-    # Launch applications
-    # ------------------------------------------------------------------
 
     @staticmethod
     def open_application(name: str) -> None:
@@ -147,7 +127,7 @@ class WindowManager:
         exe = aliases.get(name.lower())
 
         if exe:
-            logger.info("Launching alias '%s' → %s", name, exe)
+            logger.info("Launching alias '%s' -> %s", name, exe)
             try:
                 subprocess.Popen(exe, shell=True)
             except Exception as exc:

@@ -1,12 +1,12 @@
 """
-utils/one_euro_filter.py — Adaptive low-pass filter for real-time signals.
+Adaptive low-pass filter for real-time signals.
 
 The One-Euro Filter (1€ Filter) is an adaptive low-pass filter designed
 for real-time signal smoothing in human-computer interaction. It adapts
 its cutoff frequency based on signal velocity:
 
-    - Slow/still → low cutoff → heavy smoothing (removes jitter)
-    - Fast motion → high cutoff → responsive tracking (no lag)
+    - Slow/still -> low cutoff -> heavy smoothing (removes jitter)
+    - Fast motion -> high cutoff -> responsive tracking (no lag)
 
 Reference: Casiez, Roussel, Vogel (2012)
            "1€ Filter: A Simple Speed-Based Low-Pass Filter for Noisy
@@ -46,23 +46,13 @@ class LowPassFilter:
 
 
 class OneEuroFilter:
-    """
-    Adaptive low-pass filter for real-time HCI signal smoothing.
+    """Filtru trece-jos adaptiv bazat pe viteza semnalului.
 
-    Parameters
-    ----------
-    freq : float
-        Estimated signal sampling frequency (Hz). For a 30 FPS camera
-        this should be ~30.
-    min_cutoff : float
-        Minimum cutoff frequency (Hz). Controls jitter removal at low
-        speeds. Lower = smoother but laggier at rest.
-    beta : float
-        Speed coefficient. Controls lag reduction at high speeds.
-        Higher = more responsive during fast motion.
-    d_cutoff : float
-        Cutoff frequency for the derivative filter (Hz). Usually left
-        at 1.0.
+    Args:
+        freq: frecventa de esantionare (Hz), implicit ~30 pt camera
+        min_cutoff: cutoff minim (Hz) - cat de mult netezeste la repaus
+        beta: coeficient viteza - cat de repede reactioneaza la miscare
+        d_cutoff: cutoff pt filtrul derivatei (de obicei 1.0)
     """
 
     __slots__ = ("_freq", "_min_cutoff", "_beta", "_d_cutoff",
@@ -91,22 +81,8 @@ class OneEuroFilter:
         return 1.0 / (1.0 + tau / te)
 
     def __call__(self, x: float, timestamp: float | None = None) -> float:
-        """
-        Filter a single value.
-
-        Parameters
-        ----------
-        x : float
-            Raw input value.
-        timestamp : float, optional
-            Timestamp (seconds). If provided, the sampling rate is
-            computed dynamically. Otherwise the fixed ``freq`` is used.
-
-        Returns
-        -------
-        float
-            Filtered output.
-        """
+        """Filtreaza o valoare. Daca se da timestamp, calculeaza rata
+        de esantionare dinamic. Returneaza valoarea filtrata."""
         if self._last_time is not None and timestamp is not None:
             dt = timestamp - self._last_time
             if dt > 0:
@@ -121,7 +97,7 @@ class OneEuroFilter:
         alpha_d = self._alpha(self._d_cutoff, self._freq)
         edx = self._dx_filter.filter(dx, alpha_d)
 
-        # Adaptive cutoff: higher speed → higher cutoff → less smoothing
+        # Adaptive cutoff: higher speed -> higher cutoff -> less smoothing
         cutoff = self._min_cutoff + self._beta * abs(edx)
 
         # Filter the signal

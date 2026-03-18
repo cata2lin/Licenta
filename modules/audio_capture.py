@@ -1,5 +1,5 @@
 """
-modules/audio_capture.py — Microphone audio streaming.
+Microphone audio streaming.
 
 Continuously captures 16-bit PCM audio from the default microphone in a
 background thread and exposes chunks via a queue for the VAD to consume.
@@ -20,18 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 class AudioCapture:
-    """
-    Stream audio from the default input device.
+    """Stream audio de la microfonul implicit.
 
-    Parameters
-    ----------
-    sample_rate : int
-        Audio sample rate in Hz (default 16 000).
-    channels : int
-        Number of channels (1 = mono).
-    block_duration_ms : int
-        Duration of each audio block in milliseconds.  Must be 10, 20, or 30
-        for webrtcvad compatibility.
+    Args:
+        sample_rate: frecventa audio in Hz (implicit 16000)
+        channels: numar de canale (1 = mono)
+        block_duration_ms: durata unui bloc in ms (10, 20 sau 30 pt webrtcvad)
     """
 
     def __init__(
@@ -98,10 +92,6 @@ class AudioCapture:
     @property
     def is_running(self) -> bool:
         return self._running
-
-    # ------------------------------------------------------------------
-    # Internal
-    # ------------------------------------------------------------------
 
     def _audio_callback(
         self,

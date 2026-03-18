@@ -1,5 +1,5 @@
 """
-utils/geometry.py - Math helpers for hand landmark analysis.
+Math helpers for hand landmark analysis.
 
 Provides Euclidean distance, angle calculations, finger extension checks,
 and ROI-aware coordinate normalization for screen mapping.

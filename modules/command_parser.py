@@ -1,5 +1,5 @@
 """
-modules/command_parser.py — Voice command → action mapper.
+Voice command -> action mapper.
 
 Parses transcribed text (Romanian or English) into structured
 ParsedCommand objects that the orchestrator can execute.
@@ -14,11 +14,6 @@ from dataclasses import dataclass
 from enum import Enum
 
 logger = logging.getLogger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Action types
-# ---------------------------------------------------------------------------
 
 class ActionType(Enum):
     # Mouse
@@ -57,23 +52,13 @@ class ParsedCommand:
     argument: str | None = None   # e.g. text to type, app name, mode name
     raw_text: str = ""            # Original transcription
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 def _normalize(text: str) -> str:
     """Lowercase, strip diacritics, collapse whitespace."""
     text = text.lower().strip()
-    # Remove diacritics (ă→a, ț→t, etc.) for fuzzy matching
+    # Remove diacritics (ă->a, ț->t, etc.) for fuzzy matching
     nfkd = unicodedata.normalize("NFKD", text)
     without_diacritics = "".join(c for c in nfkd if not unicodedata.combining(c))
     return re.sub(r"\s+", " ", without_diacritics)
-
-
-# ---------------------------------------------------------------------------
-# Command table (ordered by priority — first match wins)
-# ---------------------------------------------------------------------------
 
 # Each entry: (list_of_trigger_phrases, action_type, has_argument)
 # Phrases with {arg} capture everything after the trigger as the argument.
@@ -113,17 +98,12 @@ _COMMANDS: list[tuple[list[str], ActionType, bool]] = [
     (["urmatoarea fereastra", "next window"], ActionType.NEXT_WINDOW, False),
     (["desktop", "show desktop", "arata desktop"], ActionType.SHOW_DESKTOP, False),
 
-    # --- Open app (must be last — captures argument) ---
+    # --- Open app (must be last  -  captures argument) ---
     (["deschide", "open"], ActionType.OPEN_APP, True),
 
-    # --- Type text (must be last — captures argument) ---
+    # --- Type text (must be last  -  captures argument) ---
     (["tasteaza", "scrie", "type"], ActionType.TYPE_TEXT, True),
 ]
-
-
-# ---------------------------------------------------------------------------
-# Parser class
-# ---------------------------------------------------------------------------
 
 class CommandParser:
     """Parse a transcribed voice string into a :class:`ParsedCommand`."""
@@ -143,7 +123,7 @@ class CommandParser:
                         rest = norm[len(trigger):].strip()
                         argument = rest if rest else self._default_arg(action, trigger)
                     cmd = ParsedCommand(action=action, argument=argument, raw_text=raw)
-                    logger.info("Parsed: '%s' → %s (arg=%s)", raw, action.value, argument)
+                    logger.info("Parsed: '%s' -> %s (arg=%s)", raw, action.value, argument)
                     return cmd
 
         # No match

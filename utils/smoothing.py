@@ -1,13 +1,13 @@
 """
-utils/smoothing.py - Filtre de netezire pentru cursor.
+Filtre de netezire pentru cursor.
 
 Implementează un smoother de coordonate bazat pe Filtrul One-Euro (1€ Filter)
 cu supresor de zonă moartă și rejecție outlier. Filtrul 1€ este un filtru
 trece-jos adaptiv care ajustează frecvența de tăiere în funcție de viteza
 semnalului:
 
-    - Mână lentă/statică → cutoff mic → netezire puternică (cursor stabil)
-    - Mișcare rapidă → cutoff mare → tracking responsiv (fără lag)
+    - Mână lentă/statică -> cutoff mic -> netezire puternică (cursor stabil)
+    - Mișcare rapidă -> cutoff mare -> tracking responsiv (fără lag)
 
 Rejecția outlier-ilor detectează salturi imposibile (ex. glitch-uri de tracking)
 și le limitează pentru a preveni teleportarea cursorului.
@@ -21,28 +21,15 @@ from utils.one_euro_filter import OneEuroFilter
 
 
 class Smoother:
-    """
-    1€ Filter-based coordinate smoother with dead-zone and outlier rejection.
+    """Smoother de coordonate bazat pe filtrul 1€, cu zona moarta
+    si rejectie outlier.
 
-    Parameters
-    ----------
-    freq : float
-        Expected sampling frequency in Hz (e.g. 30 for 30 FPS camera).
-    min_cutoff : float
-        Minimum cutoff frequency. Controls stability at low speeds.
-        At 30 FPS: cutoff=1.5 → alpha≈0.24, cutoff=3.0 → alpha≈0.39
-        Recommended: 1.5–4.0 for cursor control.
-    beta : float
-        Speed coefficient. Controls responsiveness at high speeds.
-        Higher = faster reaction to rapid hand movement.
-        Recommended: 0.5–1.5 for cursor control.
-    deadzone : float
-        Movements smaller than this (in normalised 0-1 space) are
-        suppressed to eliminate micro-tremor.
-    max_jump : float
-        Maximum single-frame movement allowed (normalised 0-1 space).
-        Jumps larger than this are clamped to prevent teleporting
-        caused by hand tracking glitches.
+    Args:
+        freq: frecventa esantionare (Hz)
+        min_cutoff: cutoff minim, stabilitate la repaus
+        beta: coeficient viteza, reactivitate la miscare
+        deadzone: miscari mai mici decat asta sunt ignorate (spatiu 0-1)
+        max_jump: salt maxim per cadru inainte de clampare (anti-teleportare)
     """
 
     def __init__(
@@ -64,7 +51,7 @@ class Smoother:
         self._prev_y: float | None = None
 
     def reset(self) -> None:
-        """Clear internal state (e.g. when the hand disappears)."""
+        """Reseteaza starea interna (cand mana dispare din cadru)."""
         self._prev_raw_x = None
         self._prev_raw_y = None
         self._prev_x = None
@@ -73,21 +60,10 @@ class Smoother:
         self._filter_y.reset()
 
     def smooth(self, raw_x: float, raw_y: float) -> tuple[float, float]:
-        """
-        Apply 1€ Filter smoothing to raw normalised coordinates.
-
-        Includes outlier rejection: if the raw position jumps more than
-        ``max_jump`` in a single frame, the movement is capped in the
-        same direction but limited in magnitude. This prevents cursor
-        teleporting from hand-tracking glitches.
-
-        The filter is ALWAYS fed values so it maintains an accurate
-        velocity estimate. The deadzone only suppresses the OUTPUT.
-
-        Returns
-        -------
-        (smoothed_x, smoothed_y) in the same 0-1 normalised space.
-        """
+        """Aplica filtrul 1€ pe coordonate raw normalizate.
+        Include rejectie outlier (salturi > max_jump sunt limitate)
+        si zona moarta (miscari prea mici sunt suprimate la output).
+        Returneaza (smoothed_x, smoothed_y) in spatiu 0-1."""
         # --- Outlier rejection ---
         # Cap impossibly large single-frame jumps (tracking glitches)
         if self._prev_raw_x is not None and self._prev_raw_y is not None:
@@ -115,7 +91,7 @@ class Smoother:
         filtered_y = max(0.0, min(1.0, filtered_y))
 
         if self._prev_x is None or self._prev_y is None:
-            # First sample — pass through.
+            # First sample  -  pass through.
             self._prev_x = filtered_x
             self._prev_y = filtered_y
             return filtered_x, filtered_y

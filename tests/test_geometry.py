@@ -48,27 +48,27 @@ class TestAngleBetween:
         assert angle == pytest.approx(45.0, abs=0.1)
 
     def test_zero_length_vector(self):
-        # Same point → should return 0 and not crash
+        # Same point -> should return 0 and not crash
         assert angle_between((0, 0), (0, 0), (1, 1)) == 0.0
 
 
 class TestIsFingerExtended:
     def test_finger_extended(self):
-        # Tip is above (lower y) PIP → extended
+        # Tip is above (lower y) PIP -> extended
         tip = (0.5, 0.2)
         pip = (0.5, 0.5)
         mcp = (0.5, 0.7)
         assert is_finger_extended(tip, pip, mcp) is True
 
     def test_finger_curled(self):
-        # Tip is below (higher y) PIP → curled
+        # Tip is below (higher y) PIP -> curled
         tip = (0.5, 0.8)
         pip = (0.5, 0.5)
         mcp = (0.5, 0.3)
         assert is_finger_extended(tip, pip, mcp) is False
 
     def test_thumb_right_hand_extended(self):
-        # Right hand: thumb tip x < pip x → extended
+        # Right hand: thumb tip x < pip x -> extended
         tip = (0.2, 0.5)
         pip = (0.4, 0.5)
         mcp = (0.5, 0.5)
@@ -81,7 +81,7 @@ class TestIsFingerExtended:
         assert is_finger_extended(tip, pip, mcp, is_thumb=True, handedness="Right") is False
 
     def test_thumb_left_hand_extended(self):
-        # Left hand: thumb tip x > pip x → extended
+        # Left hand: thumb tip x > pip x -> extended
         tip = (0.7, 0.5)
         pip = (0.5, 0.5)
         mcp = (0.4, 0.5)
