@@ -1,5 +1,5 @@
 """
-tests/test_config.py — Unit tests for config.py
+tests/test_config.py - Teste pentru config.py
 """
 
 import json

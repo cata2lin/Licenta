@@ -1,5 +1,5 @@
 """
-config.py — Global configuration manager.
+config.py - Manager global de configurari.
 
 Loads settings from settings.json, provides typed access to every parameter,
 and exposes a save() function so the tray UI can persist changes at runtime.
@@ -94,10 +94,10 @@ def load(path: Path | None = None) -> dict:
             _settings = _deep_merge(DEFAULTS, user_settings)
             logger.info("Settings loaded from %s", path)
         except (json.JSONDecodeError, OSError) as exc:
-            logger.warning("Failed to load %s (%s) — using defaults", path, exc)
+            logger.warning("Failed to load %s (%s) - using defaults", path, exc)
             _settings = copy.deepcopy(DEFAULTS)
     else:
-        logger.info("No settings file found — creating %s with defaults", path)
+        logger.info("No settings file found - creating %s with defaults", path)
         _settings = copy.deepcopy(DEFAULTS)
         save(path)
 

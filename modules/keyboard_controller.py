@@ -83,12 +83,8 @@ class KeyboardController:
         self._key_up(vk_code)
 
     def type_text(self, text: str) -> None:
-        """
-        Type a string character by character using Unicode (KEYEVENTF_UNICODE).
-
-        This bypasses keyboard layout issues — it sends the actual Unicode
-        codepoint directly.
-        """
+        """Tasteaza un string caracter cu caracter folosind Unicode
+        (KEYEVENTF_UNICODE). Evita problemele de keyboard layout."""
         for char in text:
             self._unicode_char(char)
             time.sleep(0.005)  # Small delay for stability

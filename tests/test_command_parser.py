@@ -1,5 +1,5 @@
 """
-tests/test_command_parser.py — Unit tests for modules/command_parser.py
+tests/test_command_parser.py - Teste pentru modules/command_parser.py
 """
 
 import pytest

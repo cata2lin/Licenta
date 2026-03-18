@@ -72,8 +72,8 @@ class VoiceActivityDetector:
     def feed(self, chunk: bytes) -> bytes | None:
         """
         Feed a single audio chunk and return either:
-        - ``bytes`` — the complete utterance audio (when speech ends), or
-        - ``None``  — still listening / silence.
+        - ``bytes`` - audio-ul complet al pronuntarii, sau
+        - ``None``  - inca asculta / tacere.
         """
         is_speech = self._vad.is_speech(chunk, self.sample_rate)
 

@@ -1,5 +1,5 @@
 """
-tests/test_smoothing.py — Unit tests for utils/smoothing.py (1€ Filter backend)
+tests/test_smoothing.py - Teste pentru utils/smoothing.py (filtrul 1€)
 """
 
 import pytest
